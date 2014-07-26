@@ -1,0 +1,166 @@
+=head1 REST API
+
+This document defines the REST API.  By and large, this follows the WebIOpi 
+REST interface:
+
+  https://code.google.com/p/webiopi/wiki/INSTALL?tm=6
+
+There are a few notable differences, mostly to account for being on more 
+than just the Rapsberry Pi.  For instance, the pcDuino has different 
+voltage and bit resolutions for some of its ADC and PWM channels, so 
+the API to access that data must specify a pin.
+
+Specific differences are noted as "B<COMPATIBILITY NOTE>" below.
+
+=head2 Status Codes
+
+Just a few of the HTTP status codes you might expect to hit.
+
+=head3 200 OK
+
+Success
+
+=head3 404 Not Found
+
+Using a path that isn't one of the ones defined, or using the name of 
+a device that's not configured. (Split into different status code?  403 
+for a device not found, maybe?  Doesn't seem quite right.)
+
+=head3 405 Method Not Allowed
+
+You used a method that isn't allowed for this resource.
+
+=head3 409 Conflict
+
+May happen when trying to use a pin as output when it was set as output.
+
+=head3 410 Gone
+
+May happen when you request a pin that doesn't exist.
+
+=head3 500 Internal Server Error
+
+The server done broke.
+
+
+=head2 GPIO
+
+=head3 GET /devices/[name]/count
+
+Returns the digital channel count
+
+=head3 GET /devices/[name]/[channel]/value
+
+=head3 GET /devices/[name]/*/value
+
+=head3 GET /devices/[name]/[channel]/value/[digit]
+
+(B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as POST)
+
+=head3 GET /devices/[name]/*/integer
+
+(B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as POST)
+
+=head3 POST /devices/[name]/*/integer/[value]
+
+=head3 GET /devices/[name]/[channel]/function
+
+=head3 POST /devices/[name]/[channel]/function/[func]
+
+(B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as GET)
+
+=head3 GET /devices/[name]/*
+
+
+=head2 ADC (Analog-to-Digital Converter)
+
+=head3 GET /devices/[name]/analog/count
+
+(B<NOTE>: Redundant listings in WebIOpi docs for analogCount and 
+analogResolution)
+
+=head3 GET /devices/[name]/analog/maximum
+
+=head3 GET /devices/[name]/analog/[channel]/integer
+
+(B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
+
+=head3 GET /devices/[name]/analog/[channel]/float
+
+=head3 GET /devices/[name]/analog/[channel]/volt
+
+=head3 GET /devices/[name]/analog/*/integer
+
+=head3 GET /devices/[name]/analog/*/float
+
+
+=head2 DAC (Digital-to-Analog Converter)
+
+Extends ADC interface
+
+=head3 POST /devices/[name]/analog/[channel]/integer/[value]
+
+=head3 POST /devices/[name]/analog/[channel]/float/[value]
+
+=head3 POST /devices/[name]/analog/[channel]/volt/[value]
+
+=head2 PWM (Pulse Width Modulation)
+
+=head3 GET /devices/[name]/pwm/count
+
+=head3 GET /devices/[name]/pwm/resolution
+
+=head3 GET /devices/[name]/pwm/maximum
+
+=head3 POST /devices/[name]/pwm/[channel]/integer/[value]
+
+=head3 POST /devices/[name]/pwm/[channel]/float/[value]
+
+=head3 POST /devices/[name]/pwm/[channel]/angle/[value]
+
+=head3 GET /devices/[name]/pwm/[channel]/integer
+
+=head3 GET /devices/[name]/pwm/[channel]/float
+
+=head3 GET /devices/[name]/pwm/[channel]/angle
+
+=head3 GET /devices/[name]/pwm/*/integer
+
+=head3 GET /devices/[name]/pwm/*/float
+
+=head3 GET /devices/[name]/pwm/*/angle
+
+=head3 GET /devices/[name]/pwm/*
+
+
+=head2 VideoStream
+
+=head3 GET /devices/[name]/video/count
+
+=head3 GET /devices/[name]/video/[channel]/resolution
+
+=head3 POST /devices/[name]/video/[channel]/resolution/[width]/[height]
+
+=head3 GET /devices/[name]/video/[channel]/kbps
+
+=head3 POST /devices/[name]/video/[channel]/bps/[value]
+
+=head3 GET /devices/[name]/video/[channel]/allowed-content-types
+
+=head3 GET /devices/[name]/video/[channel]/stream
+
+
+=head2 SPI
+
+=head2 I2C
+
+=head2 OneWire
+
+=head2 Pressure
+
+=head2 Luminosity
+
+=head2 Distance
+
+
+=end
