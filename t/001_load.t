@@ -23,14 +23,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 use Test::More tests => 2;
 use v5.12;
-use Plack::Test;
+use lib 't/lib';
+use PlackTest;
 use HTTP::Request::Common;
 
 
 use_ok( 'Device::WebIO::Dancer' );
 
 
-my $app = Dancer2->psgi_app;
-my $test = Plack::Test->create( $app );
+my $test = PlackTest->get_plack_test;
 my $res = $test->request( GET '/' );
 ok( $res->is_success, "Loaded Dancer2 app" );
