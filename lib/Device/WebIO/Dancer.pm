@@ -74,7 +74,8 @@ post '/devices/:name/:pin/function/:func' => sub {
     return '';
 };
 
-get qr{/devices/foo/\*} => sub {
+get qr{/devices/:name/\*} => sub {
+    # TODO
 };
 
 
