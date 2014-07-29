@@ -16,31 +16,15 @@ Specific differences are noted as "B<COMPATIBILITY NOTE>" below.
 
 Just a few of the HTTP status codes you might expect to hit.
 
-=head3 200 OK
+400 Bad Request (path incomplete)
+403 GPIO # Not Available
+403 GPIO # Disabled
+404 [something] Not Found 
 
-Success
+=head3 503 Not Implemented
 
-=head3 404 Not Found
-
-Using a path that isn't one of the ones defined, or using the name of 
-a device that's not configured. (Split into different status code?  403 
-for a device not found, maybe?  Doesn't seem quite right.)
-
-=head3 405 Method Not Allowed
-
-You used a method that isn't allowed for this resource.
-
-=head3 409 Conflict
-
-May happen when trying to use a pin as output when it was set as output.
-
-=head3 410 Gone
-
-May happen when you request a pin that doesn't exist.
-
-=head3 500 Internal Server Error
-
-The server done broke.
+The device does not support this type.  This may happen, for example, when 
+you request a pwm device when there is no pwm channel to use.
 
 
 =head2 GPIO
@@ -53,11 +37,13 @@ Returns the digital channel count
 
 =head3 GET /devices/[name]/*/value
 
-=head3 GET /devices/[name]/[channel]/value/[digit]
-
-(B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as POST)
+=head3 POST /devices/[name]/[channel]/value/[digit]
 
 =head3 GET /devices/[name]/*/integer
+
+portRead()
+
+(Return as CSV list?)
 
 (B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as POST)
 
@@ -66,6 +52,8 @@ Returns the digital channel count
 =head3 GET /devices/[name]/[channel]/function
 
 =head3 POST /devices/[name]/[channel]/function/[func]
+
+setFunctionString()
 
 (B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as GET)
 
@@ -79,11 +67,19 @@ Returns the digital channel count
 (B<NOTE>: Redundant listings in WebIOpi docs for analogCount and 
 analogResolution)
 
-=head3 GET /devices/[name]/analog/maximum
+=head3 GET /devices/[name]/analog/[channel]/maximum
 
-=head3 GET /devices/[name]/analog/[channel]/integer
+analogMaximum()
 
 (B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
+
+=head3 GET /devices/[name]/analog/[channel]/integer/vref
+
+analogReference()
+
+(B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
+
+=head3 GET /devices/[name]/analog/[channel]/integer
 
 =head3 GET /devices/[name]/analog/[channel]/float
 
@@ -91,7 +87,13 @@ analogResolution)
 
 =head3 GET /devices/[name]/analog/*/integer
 
+analogReadAll()
+
+(list returned as CSV?)
+
 =head3 GET /devices/[name]/analog/*/float
+
+(list returned as CSV?)
 
 
 =head2 DAC (Digital-to-Analog Converter)
@@ -108,9 +110,17 @@ Extends ADC interface
 
 =head3 GET /devices/[name]/pwm/count
 
-=head3 GET /devices/[name]/pwm/resolution
+=head3 GET /devices/[name]/pwm/[channel]/resolution
 
-=head3 GET /devices/[name]/pwm/maximum
+pwmResolution()
+
+(B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
+
+=head3 GET /devices/[name]/pwm/[channel]/maximum
+
+pwmMaximum()
+
+(B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
 
 =head3 POST /devices/[name]/pwm/[channel]/integer/[value]
 
