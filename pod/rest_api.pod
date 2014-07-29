@@ -21,11 +21,6 @@ Just a few of the HTTP status codes you might expect to hit.
 403 GPIO # Disabled
 404 [something] Not Found 
 
-=head3 503 Not Implemented
-
-The device does not support this type.  This may happen, for example, when 
-you request a pwm device when there is no pwm channel to use.
-
 
 =head2 GPIO
 
@@ -35,29 +30,45 @@ Returns the digital channel count
 
 =head3 GET /devices/[name]/[channel]/value
 
+Returns the value of the given digital channel
+
 =head3 GET /devices/[name]/*/value
 
-=head3 POST /devices/[name]/[channel]/value/[digit]
-
-=head3 GET /devices/[name]/*/integer
-
-portRead()
+Returns a list of values of all digital channels
 
 (Return as CSV list?)
 
 (B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as POST)
 
+=head3 POST /devices/[name]/[channel]/value/[digit]
+
+Sets the value of the digital channel
+
+=head3 GET /devices/[name]/*/integer
+
+Return an integer of all digital bits
+
 =head3 POST /devices/[name]/*/integer/[value]
+
+Write an integer for all digital bits
 
 =head3 GET /devices/[name]/[channel]/function
 
+Returns the current function of the given channel ("IN" or "OUT"(?))
+
 =head3 POST /devices/[name]/[channel]/function/[func]
+
+Sets the function of the given digital channel.
 
 setFunctionString()
 
 (B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as GET)
 
 =head3 GET /devices/[name]/*
+
+Returns a list containing the value and function of all digital channels.
+
+(Return as CSV list?)
 
 
 =head2 ADC (Analog-to-Digital Converter)
