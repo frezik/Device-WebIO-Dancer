@@ -50,20 +50,20 @@ cmp_ok( $res->code, '==', 200, "Got value response" );
 cmp_ok( $res->content, 'eq', 1 );
 
 $res = $test->request( GET "/devices/foo/*/value" );
-cmp_ok( $res->code, '==', 200, "Got read all response" );
+cmp_ok( $res->code, '==', 200, "Got read all list response" );
 cmp_ok( $res->content, 'eq', '0,0,0,0,0,1,0,1' );
 
 $res = $test->request( GET "/devices/foo/*/integer" );
-cmp_ok( $res->code, '==', 200, "Got read all response" );
+cmp_ok( $res->code, '==', 200, "Got read all int response" );
 cmp_ok( $res->content, '==', 0b00000101 );
 
 $res = $test->request( GET "/devices/foo/0/function" );
-cmp_ok( $res->code, '==', 200, "Got read all response" );
+cmp_ok( $res->code, '==', 200, "Got function type response" );
 cmp_ok( $res->content, 'eq', "IN" );
 
 $res = $test->request( POST "/devices/foo/0/function/IN" );
-cmp_ok( $res->code, '==', 200, "Got read all response" );
+cmp_ok( $res->code, '==', 200, "Got function set response" );
 
 $res = $test->request( GET "/devices/foo/*" );
-cmp_ok( $res->code, '==', 200, "Got read all response" );
+cmp_ok( $res->code, '==', 200, "Got read all everything response" );
 cmp_ok( $res->content, 'eq', "0:IN,0:IN,0:IN,0:IN,0:IN,1:IN,0:IN,1:IN" );

@@ -25,27 +25,27 @@ get '/devices/:name/count' => sub {
     return $count;
 };
 
-get '/devices/:name/*/integer' => sub {
+get qr{/devices/:name/\*/integer} => sub {
     my ($name) = params->{name};
     my $int = $webio->digital_input_port( $name );
     return $int;
 };
 
-get '/devices/:name/*/value' => sub {
-    my ($name) = params->{name};
-    my $int = $webio->digital_input_port( $name );
-
-    my @values = map {
-        ($int >> $_) & 1
-    } reverse (0 .. ($webio->digital_input_pin_count($name) - 1));
-
-    return join( ',', @values );
-};
-
 get '/devices/:name/:pin/value' => sub {
     my $name = params->{name};
     my $pin  = params->{pin};
-    my $in = $webio->digital_input( $name, $pin );
+
+    my $in;
+    if( $pin eq '*' ) {
+        my $int = $webio->digital_input_port( $name );
+        my @values = map {
+            ($int >> $_) & 1
+        } reverse (0 .. ($webio->digital_input_pin_count($name) - 1));
+        $in = join ',', @values;
+    }
+    else {
+        $in = $webio->digital_input( $name, $pin );
+    }
     return $in;
 };
 
@@ -56,7 +56,7 @@ get '/devices/:name/:pin/function' => sub {
     return 'BAD';
 };
 
-get '/devices/:name/:pin/function/:func' => sub {
+post '/devices/:name/:pin/function/:func' => sub {
     my $name = params->{name};
     my $pin  = params->{pin};
     my $func = params->{func};
@@ -74,7 +74,7 @@ get '/devices/:name/:pin/function/:func' => sub {
     return '';
 };
 
-get '/devices/foo/*' => sub {
+get qr{/devices/foo/\*} => sub {
 };
 
 
