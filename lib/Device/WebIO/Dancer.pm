@@ -52,8 +52,13 @@ get '/devices/:name/:pin/value' => sub {
 get '/devices/:name/:pin/function' => sub {
     my $name = params->{name};
     my $pin  = params->{pin};
-    # TODO get i/o type
-    return 'BAD';
+
+    # Ignore exceptions
+    my $type = eval { $webio->is_set_input( $name, $pin ) } ? 'IN'
+        : eval { $webio->is_set_output( $name, $pin ) }     ? 'OUT'
+        : 'UNSET';
+
+    return $type
 };
 
 post '/devices/:name/:pin/function/:func' => sub {
