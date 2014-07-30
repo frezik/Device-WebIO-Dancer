@@ -25,7 +25,7 @@ get '/devices/:name/count' => sub {
     return $count;
 };
 
-get qr{/devices/:name/\*/integer} => sub {
+get qr{\A /devices/:name/\*/integer \z}x => sub {
     my ($name) = params->{name};
     my $int = $webio->digital_input_port( $name );
     return $int;
@@ -38,9 +38,8 @@ get '/devices/:name/:pin/value' => sub {
     my $in;
     if( $pin eq '*' ) {
         my $int = $webio->digital_input_port( $name );
-        my @values = map {
-            ($int >> $_) & 1
-        } reverse (0 .. ($webio->digital_input_pin_count($name) - 1));
+        my @values = _int_to_array( $int,
+            $webio->digital_input_pin_count( $name ) );
         $in = join ',', @values;
     }
     else {
@@ -53,12 +52,8 @@ get '/devices/:name/:pin/function' => sub {
     my $name = params->{name};
     my $pin  = params->{pin};
 
-    # Ignore exceptions
-    my $type = eval { $webio->is_set_input( $name, $pin ) } ? 'IN'
-        : eval { $webio->is_set_output( $name, $pin ) }     ? 'OUT'
-        : 'UNSET';
-
-    return $type
+    my $type = _get_io_type( $name, $pin );
+    return $type;
 };
 
 post '/devices/:name/:pin/function/:func' => sub {
@@ -79,10 +74,42 @@ post '/devices/:name/:pin/function/:func' => sub {
     return '';
 };
 
-get qr{/devices/:name/\*} => sub {
-    # TODO
+get qr{\A /devices/:name/\* \z}x => sub {
+    my $name = params->{name};
+    my $pin_count = $webio->digital_input_pin_count( $name );
+
+    my $int = $webio->digital_input_port( $name );
+    my @values = _int_to_array( $int, $pin_count );
+
+    my @type_values = map {
+        _get_io_type( $name, $_ );
+    } 0 .. ($pin_count - 1);
+
+    my $combined_types = join ',', map {
+        $values[$_] . ':' . $type_values[$_]
+    } 0 .. ($pin_count - 1);
+    return $combined_types;
 };
 
+
+sub _int_to_array
+{
+    my ($int, $len) = @_;
+    my @values = map {
+        ($int >> $_) & 1
+    } reverse (0 .. ($len - 1));
+    return @values;
+}
+
+sub _get_io_type
+{
+    my ($name, $pin) = @_;
+    # Ignore exceptions
+    my $type = eval { $webio->is_set_input( $name, $pin ) } ? 'IN'
+        : eval { $webio->is_set_output( $name, $pin ) }     ? 'OUT'
+        : 'UNSET';
+    return $type;
+}
 
 1;
 __END__
