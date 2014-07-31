@@ -25,8 +25,9 @@ get '/devices/:name/count' => sub {
     return $count;
 };
 
-get qr{\A /devices/:name/\*/integer \z}x => sub {
+get '/devices/:name/:pin/integer' => sub {
     my ($name) = params->{name};
+    my ($pin)  = params->{pin};
     my $int = $webio->digital_input_port( $name );
     return $int;
 };
@@ -39,7 +40,7 @@ get '/devices/:name/:pin/value' => sub {
     if( $pin eq '*' ) {
         my $int = $webio->digital_input_port( $name );
         my @values = _int_to_array( $int,
-            $webio->digital_input_pin_count( $name ) );
+            reverse(0 .. $webio->digital_input_pin_count( $name ) - 1) );
         $in = join ',', @values;
     }
     else {
@@ -74,30 +75,32 @@ post '/devices/:name/:pin/function/:func' => sub {
     return '';
 };
 
-get qr{\A /devices/:name/\* \z}x => sub {
+get '/devices/:name/:pin' => sub {
     my $name = params->{name};
+    my $pin  = params->{pin};
     my $pin_count = $webio->digital_input_pin_count( $name );
+    my @pin_index_list = 0 .. ($pin_count - 1);
 
     my $int = $webio->digital_input_port( $name );
-    my @values = _int_to_array( $int, $pin_count );
-
+    my @values = _int_to_array( $int, @pin_index_list );
+    
     my @type_values = map {
         _get_io_type( $name, $_ );
-    } 0 .. ($pin_count - 1);
+    } @pin_index_list;
 
-    my $combined_types = join ',', map {
+    my $combined_types = join ',', reverse map {
         $values[$_] . ':' . $type_values[$_]
-    } 0 .. ($pin_count - 1);
+    } @pin_index_list;
     return $combined_types;
 };
 
 
 sub _int_to_array
 {
-    my ($int, $len) = @_;
+    my ($int, @index_list) = @_;
     my @values = map {
         ($int >> $_) & 1
-    } reverse (0 .. ($len - 1));
+    } @index_list;
     return @values;
 }
 
