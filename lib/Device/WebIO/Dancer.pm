@@ -81,17 +81,41 @@ get '/devices/:name/:pin' => sub {
     my $pin_count = $webio->digital_input_pin_count( $name );
     my @pin_index_list = 0 .. ($pin_count - 1);
 
-    my $int = $webio->digital_input_port( $name );
-    my @values = _int_to_array( $int, @pin_index_list );
-    
-    my @type_values = map {
-        _get_io_type( $name, $_ );
-    } @pin_index_list;
+    my (@values, @type_values);
+    foreach (@pin_index_list) {
+        my $type = _get_io_type( $name, $_ );
+        push @type_values, $type;
+
+        my $int = ($type eq 'IN') ? $webio->digital_input( $name, $_ ) :
+            ($type eq 'OUT') ? 0 :
+            0;
+        push @values, $int;
+    }
 
     my $combined_types = join ',', reverse map {
         $values[$_] . ':' . $type_values[$_]
     } @pin_index_list;
     return $combined_types;
+};
+
+post '/devices/:name/:pin/value/:digit' => sub {
+    my $name  = params->{name};
+    my $pin   = params->{pin};
+    my $digit = params->{digit};
+
+    $webio->digital_output( $name, $pin, $digit );
+
+    return '';
+};
+
+post '/devices/:name/:pin/integer/:value' => sub {
+    my $name  = params->{name};
+    my $pin   = params->{pin};
+    my $value = params->{value};
+
+    $webio->digital_output_port( $name, $value );
+
+    return '';
 };
 
 

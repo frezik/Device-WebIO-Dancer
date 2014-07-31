@@ -3,10 +3,11 @@ use v5.12;
 use Moo;
 use namespace::clean;
 
-use constant input_pin_count  => 10;
-use constant output_pin_count => 8;
 use constant TYPE_INPUT  => 1;
 use constant TYPE_OUTPUT => 0;
+
+has 'input_pin_count',  is => 'ro';
+has 'output_pin_count', is => 'ro';
 
 with 'Device::WebIO::Device::DigitalInput';
 with 'Device::WebIO::Device::DigitalOutput';
@@ -14,15 +15,11 @@ with 'Device::WebIO::Device::DigitalOutput';
 
 has '_pins' => (
     is      => 'ro',
-    default => sub {[
-        (0) x input_pin_count(),
-    ]},
+    default => sub {[]},
 );
 has '_pins_set' => (
     is      => 'ro',
-    default => sub {[
-        (0) x input_pin_count(),
-    ]},
+    default => sub {[]},
 );
 
 

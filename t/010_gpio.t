@@ -21,17 +21,18 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 13;
+use Test::More tests => 21;
 use v5.14;
 use lib 't/lib';
 use PlackTest;
 use HTTP::Request::Common;
 use Device::WebIO::Dancer;
 use Device::WebIO;
-use MockDigitalInput;
+use MockDigitalInputOutput;
 
-my $io = MockDigitalInput->new({
-    input_pin_count => 8,
+my $io = MockDigitalInputOutput->new({
+    input_pin_count  => 8,
+    output_pin_count => 8,
 });
 my $webio = Device::WebIO->new;
 $webio->register( 'foo', $io );
@@ -64,6 +65,22 @@ $res = $test->request( GET "/devices/foo/0/function" );
 cmp_ok( $res->code, '==', 200, "Got function type response" );
 cmp_ok( $res->content, 'eq', "IN" );
 
+$res = $test->request( POST "/devices/foo/1/function/OUT" );
+cmp_ok( $res->code, '==', 200, "Got function set response" );
+ok( $io->is_set_output( 1 ) );
+
+$res = $test->request( POST "/devices/foo/1/value/1" );
+cmp_ok( $res->code, '==', 200, "Set output value" );
+ok( $io->mock_get_output( 1 ), "Output value was set to TRUE" );
+
+$res = $test->request( POST "/devices/foo/1/value/0" );
+cmp_ok( $res->code, '==', 200, "Set output value" );
+ok(! $io->mock_get_output( 1 ), "Output value was set to FALSE" );
+
+$res = $test->request( POST "/devices/foo/*/integer/00000010" );
+cmp_ok( $res->code, '==', 200, "Write port response" );
+ok( $io->mock_get_output( 1 ), "Output value set by port write" );
+
 $res = $test->request( GET "/devices/foo/*" );
 cmp_ok( $res->code, '==', 200, "Got read all everything response" );
-cmp_ok( $res->content, 'eq', "0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:UNSET,1:UNSET,0:UNSET,1:IN" );
+cmp_ok( $res->content, 'eq', "0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:OUT,1:IN" );
