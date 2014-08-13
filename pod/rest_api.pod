@@ -156,19 +156,47 @@ pwmMaximum()
 
 =head2 VideoStream
 
+B<COMPATIBILITY NOTE>: This is an extension which is not currently 
+implemented in WebIOPi
+
 =head3 GET /devices/[name]/video/count
+
+Returns the number of video streams that are available.
 
 =head3 GET /devices/[name]/video/[channel]/resolution
 
-=head3 POST /devices/[name]/video/[channel]/resolution/[width]/[height]
+Returns the width and height separated by an I<x> list, followed by a 
+I<p>, followed the fps.  Example:
+
+  640x480p60
+
+=head3 POST /devices/[name]/video/[channel]/resolution/[width]/[height]/[fps]
+
+Sets the resolution and frame rate of the given channel.
+
+If the channel refuses to set the given resolution, HTTP status code 403 
+will be sent.
 
 =head3 GET /devices/[name]/video/[channel]/kbps
 
-=head3 POST /devices/[name]/video/[channel]/bps/[value]
+Get the current bitrate, as an integer in kb per second.
+
+=head3 POST /devices/[name]/video/[channel]/kbps/[value]
+
+Set the current bitrate.  C<[value]> is an integer in kb per second.
 
 =head3 GET /devices/[name]/video/[channel]/allowed-content-types
 
-=head3 GET /devices/[name]/video/[channel]/stream
+Get list of allowed MIME content types.  Allowed types will be sent as a 
+MIME string, with one on each line.
+
+=head3 GET /devices/[name]/video/[channel]/stream/[content-type1]/[content-type2]
+
+Get the video stream with the desired content type.
+
+B<NOTE>: [content-type1]/[content-type2] is really just a straight MIME 
+type, like "text/video".  It's split up this way for the sake of 
+popular server-side web libraries.
 
 
 =head2 SPI

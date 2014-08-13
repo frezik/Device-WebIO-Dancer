@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 use Test::More tests => 21;
-use v5.14;
+use v5.12;
 use lib 't/lib';
 use PlackTest;
 use HTTP::Request::Common;
