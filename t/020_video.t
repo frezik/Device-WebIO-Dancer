@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 15;
+use Test::More tests => 16;
 use v5.12;
 use lib 't/lib';
 use PlackTest;
@@ -30,14 +30,15 @@ use Device::WebIO::Dancer;
 use Device::WebIO;
 use MockVideoOutput;
 
+my $STREAM_FILE = 't_data/wumpus_video_dump.h264';
 
 my $vid = MockVideoOutput->new({
-    stream_vid_file => 't_data/',
-    content_type    => 'video/h264',
-    _vid_width      => 640,
-    _vid_height     => 480,
-    _vid_fps        => 30,
-    _vid_kbps       => 500,
+    stream_vid_file => $STREAM_FILE,
+    content_type    => [ 'video/h264' ],
+    _vid_width      => [ 640 ],
+    _vid_height     => [ 480 ],
+    _vid_fps        => [ 30  ],
+    _vid_kbps       => [ 500 ],
 });
 my $webio = Device::WebIO->new;
 $webio->register( 'foo', $vid );
@@ -73,5 +74,12 @@ $res = $test->request( GET '/devices/foo/video/0/allowed-content-types' );
 cmp_ok( $res->code, '==', 200, "Got video allowed content type response" );
 cmp_ok( $res->content, 'eq', 'video/h264' );
 
-$res = $test->request( GET '/devices/foo/video/0/stream/video/h264' );
-cmp_ok( $res->code, '==', 200, "Got video stream" );
+TODO: {
+    local $TODO = 'Waiting for send_file() fix in Dancer2 (https://github.com/PerlDancer/Dancer2/issues/659)';
+
+    $res = $test->request( GET '/devices/foo/video/0/stream/video/h264' );
+    cmp_ok( $res->code, '==', 200, "Got video stream" );
+    cmp_ok( length($res->content), '==', -s $STREAM_FILE );
+}
+
+# TODO error for trying to read a stream with an unsupported content type

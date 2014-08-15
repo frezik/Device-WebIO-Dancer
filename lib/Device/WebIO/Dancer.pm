@@ -4,6 +4,8 @@ package Device::WebIO::Dancer;
 use v5.12;
 use Dancer2;
 
+use constant VID_READ_LENGTH => 4096;
+
 
 my ($webio);
 
@@ -116,6 +118,90 @@ post '/devices/:name/:pin/integer/:value' => sub {
     $webio->digital_output_port( $name, $value );
 
     return '';
+};
+
+get '/devices/:name/video/count' => sub {
+    my $name = params->{name};
+    my $val  = $webio->vid_channels( $name );
+    return $val;
+};
+
+get '/devices/:name/video/:channel/resolution' => sub {
+    my $name    = params->{name};
+    my $channel = params->{channel};
+
+    my $width  = $webio->vid_width( $name, $channel );
+    my $height = $webio->vid_height( $name, $channel );
+    my $fps    = $webio->vid_fps( $name, $channel );
+
+    return $width . 'x' . $height . 'p' . $fps;
+};
+
+post '/devices/:name/video/:channel/resolution/:width/:height/:framerate'
+    => sub {
+    my $name    = params->{name};
+    my $channel = params->{channel};
+    my $width   = params->{width};
+    my $height  = params->{height};
+    my $fps     = params->{framerate};
+
+    $webio->vid_set_width( $name, $channel, $width );
+    $webio->vid_set_height( $name, $channel, $height );
+    $webio->vid_set_fps( $name, $channel, $fps );
+
+    return '';
+};
+
+get '/devices/:name/video/:channel/kbps' => sub {
+    my $name    = params->{name};
+    my $channel = params->{channel};
+
+    my $bitrate = $webio->vid_kbps( $name, $channel );
+
+    return $bitrate;
+};
+
+post '/devices/:name/video/:channel/kbps/:bitrate' => sub {
+    my $name    = params->{name};
+    my $channel = params->{channel};
+    my $bitrate = params->{bitrate};
+    $webio->vid_set_kbps( $name, $channel, $bitrate );
+    return '';
+};
+
+get '/devices/:name/video/:channel/allowed-content-types' => sub {
+    my $name    = params->{name};
+    my $channel = params->{channel};
+    my $allowed = $webio->vid_allowed_content_types( $name, $channel );
+    return join( "\n", @$allowed );
+};
+
+get '/devices/:name/video/:channel/stream/:type1/:type2' => sub {
+    my $name    = params->{name};
+    my $channel = params->{channel};
+    my $type1   = params->{type1};
+    my $type2   = params->{type2};
+    my $mime_type = $type1 . '/' . $type2;
+
+DEBUG: $DB::single = 1;
+    my $in_fh = $webio->vid_stream( $name, $channel, $mime_type );
+
+    return send_file( '/dev/null',
+        streaming    => 1,
+        system_path  => 1,
+        content_type => $mime_type,
+        callbacks    => {
+            override => sub {
+                my ($respond, $response) = @_;
+                my $writer = $respond->([ 200, {} ]);
+
+                my $buf = '';
+                while( read( $in_fh, $buf, VID_READ_LENGTH ) ) {
+                    $writer->write( $buf );
+                }
+            }
+        },
+    );
 };
 
 
