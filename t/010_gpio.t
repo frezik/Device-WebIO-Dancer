@@ -77,10 +77,11 @@ $res = $test->request( POST "/devices/foo/1/value/0" );
 cmp_ok( $res->code, '==', 200, "Set output value" );
 ok(! $io->mock_get_output( 1 ), "Output value was set to FALSE" );
 
-$res = $test->request( POST "/devices/foo/*/integer/00000010" );
+$test->request( POST "/devices/foo/2/function/IN" );
+$res = $test->request( POST "/devices/foo/*/integer/00000110" );
 cmp_ok( $res->code, '==', 200, "Write port response" );
 ok( $io->mock_get_output( 1 ), "Output value set by port write" );
 
 $res = $test->request( GET "/devices/foo/*" );
 cmp_ok( $res->code, '==', 200, "Got read all everything response" );
-cmp_ok( $res->content, 'eq', "0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:OUT,1:IN" );
+cmp_ok( $res->content, 'eq', "0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:UNSET,1:IN,0:OUT,0:IN" );
