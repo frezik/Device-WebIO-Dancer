@@ -1,8 +1,8 @@
 * Catch exceptions and throw right error code
 * Implement ADC interface
 * Implement PWM interface
+* Fix video streaming once Dancer2 send_file() is fixed
 * Invent interfaces:
-    * VideoStream
     * SPI
     * I2C
     * 1-Wire
