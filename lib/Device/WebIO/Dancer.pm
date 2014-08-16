@@ -183,7 +183,6 @@ get '/devices/:name/video/:channel/stream/:type1/:type2' => sub {
     my $type2   = params->{type2};
     my $mime_type = $type1 . '/' . $type2;
 
-DEBUG: $DB::single = 1;
     my $in_fh = $webio->vid_stream( $name, $channel, $mime_type );
 
     return send_file( '/dev/null',
@@ -202,6 +201,57 @@ DEBUG: $DB::single = 1;
             }
         },
     );
+};
+
+get '/devices/:name/analog/count' => sub {
+    my $name = params->{name};
+    my $count = $webio->adc_count( $name );
+    return $count;
+};
+
+get '/devices/:name/analog/:pin/maximum' => sub {
+    my $name = params->{name};
+    my $pin  = params->{pin};
+    my $max = $webio->adc_max_int( $name, $pin );
+    return $max;
+};
+
+get '/devices/:name/analog/:pin/integer/vref' => sub {
+    my $name = params->{name};
+    my $pin  = params->{pin};
+    my $value = $webio->adc_volt_ref( $name, $pin );
+    return $value;
+};
+
+get '/devices/:name/analog/:pin/integer' => sub {
+    my $name = params->{name};
+    my $pin  = params->{pin};
+
+    my $value;
+    if( $pin eq '*' ) {
+        my @val = map {
+            $webio->adc_input_int( $name, $_ ) // 0
+        } 0 .. ($webio->adc_count( $name ) - 1);
+        $value = join ',', @val;
+    }
+    else {
+        $value = $webio->adc_input_int( $name, $pin );
+    }
+    return $value;
+};
+
+get '/devices/:name/analog/:pin/float' => sub {
+    my $name = params->{name};
+    my $pin  = params->{pin};
+    my $value = $webio->adc_input_float( $name, $pin );
+    return $value;
+};
+
+get '/devices/:name/analog/:pin/volt' => sub {
+    my $name = params->{name};
+    my $pin  = params->{pin};
+    my $value = $webio->adc_input_volts( $name, $pin );
+    return $value;
 };
 
 

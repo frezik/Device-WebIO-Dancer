@@ -21,9 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More 
-    skip_all => 'ADC not yet implemented';
-    #tests => 14;
+use Test::More tests => 14;
 use v5.14;
 use lib 't/lib';
 use PlackTest;
@@ -55,7 +53,7 @@ cmp_ok( $res->content, '==', 2**8 - 1 );
 
 $res = $test->request( GET "/devices/foo/analog/0/integer/vref" );
 cmp_ok( $res->code, '==', 200, "Got adc vref response" );
-cmp_ok( $res->content, '==', 2**8 - 1 );
+cmp_ok( $res->content, '==', 5.0 );
 
 $res = $test->request( GET "/devices/foo/analog/0/integer" );
 cmp_ok( $res->code, '==', 200, "Got adc input integer response" );
@@ -63,7 +61,7 @@ cmp_ok( $res->content, '==', 255 );
 
 $res = $test->request( GET "/devices/foo/analog/0/float" );
 cmp_ok( $res->code, '==', 200, "Got adc input float response" );
-cmp_ok( $res->content, '==', 255 );
+cmp_ok( $res->content, '==', 1 );
 
 $res = $test->request( GET "/devices/foo/analog/0/volt" );
 cmp_ok( $res->code, '==', 200, "Got adc input volt response" );
