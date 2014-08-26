@@ -74,8 +74,8 @@ $res = $test->request( GET '/devices/foo/video/0/allowed-content-types' );
 cmp_ok( $res->code, '==', 200, "Got video allowed content type response" );
 cmp_ok( $res->content, 'eq', 'video/h264' );
 
-TODO: {
-    local $TODO = 'Waiting for send_file() fix in Dancer2 (https://github.com/PerlDancer/Dancer2/issues/659)';
+SKIP: {
+    skip q{Plack::Test doesn't seem to handle streaming correctly}, 2;
 
     $res = $test->request( GET '/devices/foo/video/0/stream/video/h264' );
     cmp_ok( $res->code, '==', 200, "Got video stream" );

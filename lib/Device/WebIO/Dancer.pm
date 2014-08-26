@@ -185,19 +185,19 @@ get '/devices/:name/video/:channel/stream/:type1/:type2' => sub {
 
     my $in_fh = $webio->vid_stream( $name, $channel, $mime_type );
 
-    return send_file( '/dev/null',
+    return send_file( '/etc/hosts',
         streaming    => 1,
         system_path  => 1,
         content_type => $mime_type,
         callbacks    => {
-            override => sub {
-                my ($respond, $response) = @_;
-                my $writer = $respond->([ 200, {} ]);
+            around_content => sub {
+                my ($writer, $chunk) = @_;
 
-                my $buf = '';
+                my $buf;
                 while( read( $in_fh, $buf, VID_READ_LENGTH ) ) {
                     $writer->write( $buf );
                 }
+                close $in_fh;
             }
         },
     );
