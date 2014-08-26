@@ -2,7 +2,7 @@ package Device::WebIO::Dancer;
 
 # ABSTRACT: REST interface for Device::WebIO using Dancer
 use v5.12;
-use Dancer2;
+use Dancer;
 
 use constant VID_READ_LENGTH => 4096;
 
@@ -273,6 +273,7 @@ sub _get_io_type
         : 'UNSET';
     return $type;
 }
+
 
 1;
 __END__

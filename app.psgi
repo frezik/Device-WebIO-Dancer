@@ -1,4 +1,4 @@
-use Dancer2;
+use Dancer;
 use Device::WebIO::Dancer;
 use Plack::Builder;
  

@@ -33,4 +33,9 @@ use_ok( 'Device::WebIO::Dancer' );
 
 my $test = PlackTest->get_plack_test;
 my $res = $test->request( GET '/' );
-ok( $res->is_success, "Loaded Dancer2 app" );
+if( $res->is_success ) {
+    pass( "Loaded Dancer app" );
+}
+else {
+    BAIL_OUT( "Error loading PlackTest: " . $res->content );
+}
