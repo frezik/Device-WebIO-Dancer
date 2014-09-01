@@ -209,6 +209,13 @@ get '/devices/:name/analog/count' => sub {
     return $count;
 };
 
+get '/devices/:name/analog/maximum' => sub {
+    # TODO deprecate this more explicitly (301 Moved Permanently?)
+    my $name = params->{name};
+    my $max = $webio->adc_max_int( $name, 0 );
+    return $max;
+};
+
 get '/devices/:name/analog/:pin/maximum' => sub {
     my $name = params->{name};
     my $pin  = params->{pin};
@@ -220,6 +227,13 @@ get '/devices/:name/analog/:pin/integer/vref' => sub {
     my $name = params->{name};
     my $pin  = params->{pin};
     my $value = $webio->adc_volt_ref( $name, $pin );
+    return $value;
+};
+
+get '/devices/:name/analog/integer/vref' => sub {
+    # TODO deprecate this more explicitly (301 Moved Permanently?)
+    my $name = params->{name};
+    my $value = $webio->adc_volt_ref( $name, 0 );
     return $value;
 };
 

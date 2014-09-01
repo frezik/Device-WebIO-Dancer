@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 14;
+use Test::More tests => 18;
 use v5.14;
 use lib 't/lib';
 use PlackTest;
@@ -51,8 +51,16 @@ $res = $test->request( GET "/devices/foo/analog/0/maximum" );
 cmp_ok( $res->code, '==', 200, "Got adc max response" );
 cmp_ok( $res->content, '==', 2**8 - 1 );
 
+$res = $test->request( GET "/devices/foo/analog/maximum" );
+cmp_ok( $res->code, '==', 200, "Got adc max response from default pin" );
+cmp_ok( $res->content, '==', 2**8 - 1 );
+
 $res = $test->request( GET "/devices/foo/analog/0/integer/vref" );
 cmp_ok( $res->code, '==', 200, "Got adc vref response" );
+cmp_ok( $res->content, '==', 5.0 );
+
+$res = $test->request( GET "/devices/foo/analog/integer/vref" );
+cmp_ok( $res->code, '==', 200, "Got adc vref response from default pin" );
 cmp_ok( $res->content, '==', 5.0 );
 
 $res = $test->request( GET "/devices/foo/analog/0/integer" );

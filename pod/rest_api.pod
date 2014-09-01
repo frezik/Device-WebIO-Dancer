@@ -78,17 +78,33 @@ Returns a list containing the value and function of all digital channels.
 (B<NOTE>: Redundant listings in WebIOpi docs for analogCount and 
 analogResolution)
 
+=head3 GET /devices/[name]/analog/maximum
+
+B<DEPRECATED>.  Return the maximum integer value of channel 0.
+
+This is retained for compatibility with the original WebIOPi.  Since different 
+pins can have different values, you should use the version that specifies a 
+pin instead.
+
 =head3 GET /devices/[name]/analog/[channel]/maximum
+
+Return the maximum integer value of the given channel.
 
 analogMaximum()
 
-(B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
+=head3 GET /devices/[name]/analog/integer/vref
+
+B<DEPRECATED>.  Return the voltage reference of channel 0.
+
+This is retained for compatibility with the original WebIOPi.  Since different 
+pins can have different values, you should use the version that specifies a 
+pin instead.
 
 =head3 GET /devices/[name]/analog/[channel]/integer/vref
 
-analogReference()
+Return the voltage reference of the given channel.
 
-(B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
+analogReference()
 
 =head3 GET /devices/[name]/analog/[channel]/integer
 
@@ -121,13 +137,31 @@ Extends ADC interface
 
 =head3 GET /devices/[name]/pwm/count
 
+=head3 GET /devices/[name]/pwm/resolution
+
+B<DEPRECATED>.  Return the PWM resolution of channel 0.
+
+This is retained for compatibility with the original WebIOPi.  Since different 
+pins can have different values, you should use the version that specifies a 
+pin instead.
+
 =head3 GET /devices/[name]/pwm/[channel]/resolution
+
+Return the PWM resolution of the given channel.
 
 pwmResolution()
 
-(B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
+=head3 GET /devices/[name]/pwm/maximum
+
+B<DEPRECATED>.  Return the PWM maximum integer value of channel 0.
+
+This is retained for compatibility with the original WebIOPi.  Since different 
+pins can have different values, you should use the version that specifies a 
+pin instead.
 
 =head3 GET /devices/[name]/pwm/[channel]/maximum
+
+Return the PWM maximum integer value of the given channel.
 
 pwmMaximum()
 
