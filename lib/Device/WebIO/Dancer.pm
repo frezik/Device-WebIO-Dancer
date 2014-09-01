@@ -18,7 +18,7 @@ sub init
 
 
 get '/' => sub {
-    "Hello, world!";
+    return 'Hello, world!';
 };
 
 get '/devices/:name/count' => sub {
