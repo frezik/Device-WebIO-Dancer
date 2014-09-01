@@ -17,10 +17,6 @@ sub init
 }
 
 
-get '/' => sub {
-    return 'Hello, world!';
-};
-
 get '/devices/:name/count' => sub {
     my $name  = params->{name};
     my $count = $webio->digital_input_pin_count( $name );
@@ -266,6 +262,11 @@ get '/devices/:name/analog/:pin/volt' => sub {
     my $pin  = params->{pin};
     my $value = $webio->adc_input_volts( $name, $pin );
     return $value;
+};
+
+
+get '/' => sub {
+    return 'Hello, world!';
 };
 
 
