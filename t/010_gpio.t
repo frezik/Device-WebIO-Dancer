@@ -105,12 +105,8 @@ cmp_ok( $res->content, 'eq', '0' );
 $res = $test->request( POST "/GPIO/1/value/1" );
 cmp_ok( $res->code, '==', 200, "Set value response" );
 
-TODO: {
-    local $TODO = 'Pulse and sequence not yet implemented';
+$res = $test->request( POST "/GPIO/1/pulse" );
+cmp_ok( $res->code, '==', 200, "Set pulse response" );
 
-    $res = $test->request( POST "/GPIO/1/pulse" );
-    cmp_ok( $res->code, '==', 200, "Set pulse response" );
-
-    $res = $test->request( POST "/GPIO/1/sequence/10,010" );
-    cmp_ok( $res->code, '==', 200, "Set sequence response" );
-}
+$res = $test->request( POST "/GPIO/1/sequence/10,010" );
+cmp_ok( $res->code, '==', 200, "Set sequence response" );

@@ -3,8 +3,10 @@ package Device::WebIO::Dancer;
 # ABSTRACT: REST interface for Device::WebIO using Dancer
 use v5.12;
 use Dancer;
+use Time::HiRes 'sleep';
 
 use constant VID_READ_LENGTH => 4096;
+use constant PULSE_TIME      => 0.1;
 
 
 my ($webio, $default_name);
@@ -305,11 +307,31 @@ post '/GPIO/:pin/value/:value' => sub {
     return '';
 };
 
-#post '/GPIO/:pin/pulse' => sub {
-#};
+post '/GPIO/:pin/pulse' => sub {
+    my $pin   = params->{pin};
 
-#post '/GPIO/:pin/sequence/:seq' => sub {
-#};
+    $webio->digital_output( $default_name, $pin, 1 );
+    sleep PULSE_TIME;
+    $webio->digital_output( $default_name, $pin, 0 );
+
+    return '';
+};
+
+post '/GPIO/:pin/sequence/:seq' => sub {
+    my $pin = params->{pin};
+    my $seq = params->{seq};
+    my ($duration, $bits) = split /,/, $seq, 2;
+    my @bits = split //, $bits;
+
+    foreach my $value (@bits) {
+        my $duration_ms = $duration / 1000;
+
+        $webio->digital_output( $default_name, $pin, $value );
+        sleep $duration_ms;
+    }
+
+    return '';
+};
 
 
 get '/' => sub {
