@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 21;
+use Test::More tests => 31;
 use v5.12;
 use lib 't/lib';
 use PlackTest;
@@ -36,7 +36,7 @@ my $io = MockDigitalInputOutput->new({
 });
 my $webio = Device::WebIO->new;
 $webio->register( 'foo', $io );
-my $test = PlackTest->get_plack_test( $webio );
+my $test = PlackTest->get_plack_test( $webio, 'foo' );
 
 $io->mock_set_input( 0, 1 );
 $io->mock_set_input( 1, 0 );
@@ -85,3 +85,32 @@ ok( $io->mock_get_output( 1 ), "Output value set by port write" );
 $res = $test->request( GET "/devices/foo/*" );
 cmp_ok( $res->code, '==', 200, "Got read all everything response" );
 cmp_ok( $res->content, 'eq', "0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:UNSET,1:IN,0:OUT,0:IN" );
+
+
+$res = $test->request( GET "/GPIO/0/function" );
+cmp_ok( $res->code, '==', 200, "Got function response in" );
+cmp_ok( $res->content, 'eq', 'in' );
+
+$res = $test->request( POST "/GPIO/2/function/in" );
+cmp_ok( $res->code, '==', 200, "Set function response" );
+
+$res = $test->request( GET "/GPIO/1/function" );
+cmp_ok( $res->code, '==', 200, "Got function response out" );
+cmp_ok( $res->content, 'eq', 'out' );
+
+$res = $test->request( GET "/GPIO/0/value" );
+cmp_ok( $res->code, '==', 200, "Got value response" );
+cmp_ok( $res->content, 'eq', '0' );
+
+$res = $test->request( POST "/GPIO/1/value/1" );
+cmp_ok( $res->code, '==', 200, "Set value response" );
+
+TODO: {
+    local $TODO = 'Pulse and sequence not yet implemented';
+
+    $res = $test->request( POST "/GPIO/1/pulse" );
+    cmp_ok( $res->code, '==', 200, "Set pulse response" );
+
+    $res = $test->request( POST "/GPIO/1/sequence/10,010" );
+    cmp_ok( $res->code, '==', 200, "Set sequence response" );
+}

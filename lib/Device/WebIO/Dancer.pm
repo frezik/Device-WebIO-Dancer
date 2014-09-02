@@ -7,12 +7,13 @@ use Dancer;
 use constant VID_READ_LENGTH => 4096;
 
 
-my ($webio);
+my ($webio, $default_name);
 
 sub init
 {
-    my ($webio_ext) = @_;
-    $webio = $webio_ext;
+    my ($webio_ext, $default_name_ext) = @_;
+    $webio        = $webio_ext;
+    $default_name = $default_name_ext;
     return 1;
 }
 
@@ -265,9 +266,56 @@ get '/devices/:name/analog/:pin/volt' => sub {
 };
 
 
+get '/GPIO/:pin/function' => sub {
+    my $pin  = params->{pin};
+
+    my $type = lc _get_io_type( $default_name, $pin );
+    return $type;
+};
+
+post '/GPIO/:pin/function/:func' => sub {
+    my $pin  = params->{pin};
+    my $func = params->{func};
+
+    if( 'in' eq $func ) {
+        $webio->set_as_input( $default_name, $pin );
+    }
+    elsif( 'out' eq $func ) {
+        $webio->set_as_output( $default_name, $pin );
+    }
+    else {
+        # TODO
+    }
+
+    return '';
+};
+
+get '/GPIO/:pin/value' => sub {
+    my $pin = params->{pin};
+    my $in = $webio->digital_input( $default_name, $pin );
+    return $in;
+};
+
+post '/GPIO/:pin/value/:value' => sub {
+    my $pin   = params->{pin};
+    my $value = params->{value};
+
+    $webio->digital_output( $default_name, $pin, $value );
+
+    return '';
+};
+
+#post '/GPIO/:pin/pulse' => sub {
+#};
+
+#post '/GPIO/:pin/sequence/:seq' => sub {
+#};
+
+
 get '/' => sub {
     return 'Hello, world!';
 };
+
 
 
 sub _int_to_array
