@@ -9,9 +9,9 @@ use Plack::Builder;
 
 sub get_plack_test
 {
-    my ($class, $webio) = @_;
+    my ($class, $webio, $default_name) = @_;
 
-    Device::WebIO::Dancer::init( $webio );
+    Device::WebIO::Dancer::init( $webio, $default_name );
 
     my $app = Dancer::Handler->psgi_app;
     my $test = Plack::Test->create( $app );

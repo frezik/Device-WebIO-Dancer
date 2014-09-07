@@ -3,23 +3,22 @@ package Device::WebIO::Dancer;
 # ABSTRACT: REST interface for Device::WebIO using Dancer
 use v5.12;
 use Dancer;
+use Time::HiRes 'sleep';
 
 use constant VID_READ_LENGTH => 4096;
+use constant PULSE_TIME      => 0.1;
 
 
-my ($webio);
+my ($webio, $default_name);
 
 sub init
 {
-    my ($webio_ext) = @_;
-    $webio = $webio_ext;
+    my ($webio_ext, $default_name_ext) = @_;
+    $webio        = $webio_ext;
+    $default_name = $default_name_ext;
     return 1;
 }
 
-
-get '/' => sub {
-    "Hello, world!";
-};
 
 get '/devices/:name/count' => sub {
     my $name  = params->{name};
@@ -267,6 +266,78 @@ get '/devices/:name/analog/:pin/volt' => sub {
     my $value = $webio->adc_input_volts( $name, $pin );
     return $value;
 };
+
+
+get '/GPIO/:pin/function' => sub {
+    my $pin  = params->{pin};
+
+    my $type = lc _get_io_type( $default_name, $pin );
+    return $type;
+};
+
+post '/GPIO/:pin/function/:func' => sub {
+    my $pin  = params->{pin};
+    my $func = params->{func};
+
+    if( 'in' eq $func ) {
+        $webio->set_as_input( $default_name, $pin );
+    }
+    elsif( 'out' eq $func ) {
+        $webio->set_as_output( $default_name, $pin );
+    }
+    else {
+        # TODO
+    }
+
+    return '';
+};
+
+get '/GPIO/:pin/value' => sub {
+    my $pin = params->{pin};
+    my $in = $webio->digital_input( $default_name, $pin );
+    return $in;
+};
+
+post '/GPIO/:pin/value/:value' => sub {
+    my $pin   = params->{pin};
+    my $value = params->{value};
+
+    $webio->digital_output( $default_name, $pin, $value );
+
+    return '';
+};
+
+post '/GPIO/:pin/pulse' => sub {
+    my $pin   = params->{pin};
+
+    $webio->digital_output( $default_name, $pin, 1 );
+    sleep PULSE_TIME;
+    $webio->digital_output( $default_name, $pin, 0 );
+
+    return '';
+};
+
+post '/GPIO/:pin/sequence/:seq' => sub {
+    my $pin = params->{pin};
+    my $seq = params->{seq};
+    my ($duration, $bits) = split /,/, $seq, 2;
+    my @bits = split //, $bits;
+
+    foreach my $value (@bits) {
+        my $duration_ms = $duration / 1000;
+
+        $webio->digital_output( $default_name, $pin, $value );
+        sleep $duration_ms;
+    }
+
+    return '';
+};
+
+
+get '/' => sub {
+    return 'Hello, world!';
+};
+
 
 
 sub _int_to_array

@@ -1,10 +1,13 @@
 use Dancer;
 use Device::WebIO::Dancer;
+use Device::WebIO;
 use Plack::Builder;
+
+my $webio = Device::WebIO->new;
+Device::WebIO::Dancer::init( $webio );
+
  
 builder {
-    enable 'Deflater';
-    enable 'Session', store => 'File';
-    enable 'Debug', panels => [ qw<DBITrace Memory Timer> ];
+    do 'default_enable.pl';
     dance;
 };
