@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 31;
+use Test::More tests => 35;
 use v5.12;
 use lib 't/lib';
 use PlackTest;
@@ -110,3 +110,12 @@ cmp_ok( $res->code, '==', 200, "Set pulse response" );
 
 $res = $test->request( POST "/GPIO/1/sequence/10,010" );
 cmp_ok( $res->code, '==', 200, "Set sequence response" );
+
+
+$res = $test->request( GET "/*" );
+cmp_ok( $res->code, '==', 200, "Got function response in" );
+like( $res->content, qr/"UART"/x );
+
+$res = $test->request( GET "/map" );
+cmp_ok( $res->code, '==', 200, "Got function response in" );
+like( $res->content, qr/"V50"/ );

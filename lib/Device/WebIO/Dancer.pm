@@ -334,6 +334,15 @@ post '/GPIO/:pin/sequence/:seq' => sub {
 };
 
 
+get '/map' => sub {
+    return to_json( $webio->pin_desc( $default_name ) );
+};
+
+get qr{\A / \* }x => sub {
+    return to_json( $webio->all_desc( $default_name ) );
+};
+
+
 get '/' => sub {
     return 'Hello, world!';
 };

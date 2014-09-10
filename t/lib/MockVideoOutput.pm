@@ -10,6 +10,10 @@ has '_vid_fps',         is => 'ro', default => sub {[]};
 has '_vid_kbps',        is => 'ro', default => sub {[]};
 with 'Device::WebIO::Device::VideoOutput';
 
+# Placeholders
+sub pin_desc {}
+sub all_desc {}
+
 
 sub vid_channels { 1 }
 
