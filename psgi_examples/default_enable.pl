@@ -16,6 +16,9 @@ my $logger = Log::Dispatch->new(
     ],
 );
 
+set log => 'core';
+set show_errors => 1;
+
 
 enable 'Deflater';
 enable 'Session', store => 'File';

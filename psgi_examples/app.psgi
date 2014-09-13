@@ -8,6 +8,7 @@ Device::WebIO::Dancer::init( $webio );
 
  
 builder {
-    do 'default_enable.pl';
+    do 'psgi_examples/default_enable.pl'
+        or die "Can't open default_enable.pl: $!\n";
     dance;
 };
