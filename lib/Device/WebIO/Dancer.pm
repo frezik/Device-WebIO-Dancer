@@ -61,7 +61,7 @@ get '/devices/:name/:pin/function' => sub {
 post '/devices/:name/:pin/function/:func' => sub {
     my $name = params->{name};
     my $pin  = params->{pin};
-    my $func = params->{func};
+    my $func = uc params->{func};
 
     if( 'IN' eq $func ) {
         $webio->set_as_input( $name, $pin );
@@ -277,12 +277,12 @@ get '/GPIO/:pin/function' => sub {
 
 post '/GPIO/:pin/function/:func' => sub {
     my $pin  = params->{pin};
-    my $func = params->{func};
+    my $func = uc params->{func};
 
-    if( 'in' eq $func ) {
+    if( 'IN' eq $func ) {
         $webio->set_as_input( $default_name, $pin );
     }
-    elsif( 'out' eq $func ) {
+    elsif( 'OUT' eq $func ) {
         $webio->set_as_output( $default_name, $pin );
     }
     else {

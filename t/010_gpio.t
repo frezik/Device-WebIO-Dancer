@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 35;
+use Test::More tests => 42;
 use v5.12;
 use lib 't/lib';
 use PlackTest;
@@ -59,15 +59,26 @@ cmp_ok( $res->code, '==', 200, "Got read all int response" );
 cmp_ok( $res->content, '==', 0b00000101 );
 
 $res = $test->request( POST "/devices/foo/0/function/IN" );
-cmp_ok( $res->code, '==', 200, "Got function set response" );
+cmp_ok( $res->code, '==', 200, "Got function set response IN" );
+
+$res = $test->request( POST "/devices/foo/2/function/in" );
+cmp_ok( $res->code, '==', 200, "Got function set response in" );
 
 $res = $test->request( GET "/devices/foo/0/function" );
 cmp_ok( $res->code, '==', 200, "Got function type response" );
 cmp_ok( $res->content, 'eq', "IN" );
 
 $res = $test->request( POST "/devices/foo/1/function/OUT" );
-cmp_ok( $res->code, '==', 200, "Got function set response" );
+cmp_ok( $res->code, '==', 200, "Got function set response OUT" );
 ok( $io->is_set_output( 1 ) );
+
+$res = $test->request( POST "/devices/foo/3/function/out" );
+cmp_ok( $res->code, '==', 200, "Got function set response out" );
+ok( $io->is_set_output( 3 ) );
+
+$res = $test->request( GET "/devices/foo/1/function" );
+cmp_ok( $res->code, '==', 200, "Got function type response" );
+cmp_ok( $res->content, 'eq', "OUT" );
 
 $res = $test->request( POST "/devices/foo/1/value/1" );
 cmp_ok( $res->code, '==', 200, "Set output value" );
@@ -84,7 +95,7 @@ ok( $io->mock_get_output( 1 ), "Output value set by port write" );
 
 $res = $test->request( GET "/devices/foo/*" );
 cmp_ok( $res->code, '==', 200, "Got read all everything response" );
-cmp_ok( $res->content, 'eq', "0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:UNSET,1:IN,0:OUT,0:IN" );
+cmp_ok( $res->content, 'eq', "0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:OUT,1:IN,0:OUT,0:IN" );
 
 
 $res = $test->request( GET "/GPIO/0/function" );
@@ -93,6 +104,10 @@ cmp_ok( $res->content, 'eq', 'in' );
 
 $res = $test->request( POST "/GPIO/2/function/in" );
 cmp_ok( $res->code, '==', 200, "Set function response" );
+
+$res = $test->request( POST "/GPIO/3/function/IN" );
+cmp_ok( $res->code, '==', 200, "Set function response" );
+ok( $io->is_set_input( 3 ) );
 
 $res = $test->request( GET "/GPIO/1/function" );
 cmp_ok( $res->code, '==', 200, "Got function response out" );
@@ -110,7 +125,6 @@ cmp_ok( $res->code, '==', 200, "Set pulse response" );
 
 $res = $test->request( POST "/GPIO/1/sequence/10,010" );
 cmp_ok( $res->code, '==', 200, "Set sequence response" );
-
 
 $res = $test->request( GET "/*" );
 cmp_ok( $res->code, '==', 200, "Got function response in" );
