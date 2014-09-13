@@ -14,6 +14,8 @@
    limitations under the License.
 */
 
+var CONTEXT = "/";
+
 var _gaq = _gaq || [];
 var _webiopi;
 
@@ -71,7 +73,7 @@ if (deviceAgent.match(/(iphone|ipod|ipad)/) ||
 
 function WebIOPi() {
 	this.readyCallback = null;
-	this.context = "/";
+	this.context = CONTEXT;
 	this.GPIO = Array(54);
 	this.PINS = Array(27);
 
@@ -99,23 +101,11 @@ function WebIOPi() {
 		this.GPIO[i] = gpio;
 	}
 
-	// get context
-	var reg = new RegExp("http://" + window.location.host + "(.*)webiopi.js");
-	var scripts = document.getElementsByTagName("script");
-	for(var i = 0; i < scripts.length; i++) {
-		var res = reg.exec(scripts[i].src);
-		if (res && (res.length > 1)) {
-			script = scripts[i];
-			this.context = res[1];
-			
-		}
-	}
-
 	var head = document.getElementsByTagName('head')[0];
 
 	var jquery = document.createElement('script');
 	jquery.type = 'text/javascript';
-	jquery.src = '/jquery.js';
+	jquery.src = '../../jquery.js';
 //	if (!isMobile()) {
 		jquery.onload = function() {
 			w().init();
@@ -149,7 +139,7 @@ function WebIOPi() {
 	var style = document.createElement('link');
 	style.rel = "stylesheet";
 	style.type = 'text/css';
-	style.href = '/webiopi.css';
+	style.href = '../../webiopi.css';
 	head.appendChild(style);
 
 /*
