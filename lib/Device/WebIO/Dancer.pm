@@ -371,3 +371,64 @@ sub _get_io_type
 
 1;
 __END__
+
+
+=head1 NAME
+
+=head1 DESCRIPTION
+
+=head1 DEPLOYMENT
+
+=head2 Apache2/mod_perl2
+
+Set the root Location directive in your VirtualHost to point the PSGI 
+script you want:
+
+	<Location />
+		SetHandler perl-script
+		PerlResponseHandler Plack::Handler::Apache2
+		PerlSetVar psgi_app /var/www/raspberrypi.psgi
+	</Location>
+
+Copy the C<public/> directory from the Device::WebIO::Dancer distribution 
+into its own directory in your VirtualHost's docroot.  If you copied it to 
+C<app/>, then add to your VirtualHost config:
+
+	<Location /app>
+		SetHandler None
+	</Location>
+
+This needs to come I<after> the "<Location />" section above.
+
+If you're using C<Device::WebIO::RaspberryPi>, note that the underlying 
+Wiring library needs to be init'd before the Apache startup drops its root
+privileges.  To make sure you do this, create a C<mod_perl_config.pl> file in 
+your Apache2 config dir:
+
+    use Device::WebIO::RaspberryPi;
+    my $rpi = Device::WebIO::RaspberryPi->new;
+    1;
+
+And run that from the Apache2 config with:
+
+    PerlConfigRequire /etc/apache2/mod_perl_config.pl
+
+Finally, load up the modules you need in C<mod_perl_post_config.pl>:
+
+    use Device::WebIO;
+    use Device::WebIO::RaspberryPi;
+    use Device::WebIO::Dancer;
+    1;
+
+And call that with:
+
+    PerlPostConfigRequire /etc/apache2/mod_perl_post_config.pl
+
+At this point, you should be able to startup Apache.  Calling 
+C<http://example.com/*> should get you a JSON dump of the pins.  Calling 
+C<http://example.com/app/app/gpio-header/index.html> should get you a 
+layout of the pins with their current values.
+
+=head1 LICENSE
+
+=cut
