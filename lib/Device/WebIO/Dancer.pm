@@ -366,7 +366,6 @@ sub _get_io_type
         : eval { $webio->is_set_output( $name, $pin ) }     ? 'OUT'
         : 'UNSET';
     warn "Caught exception while getting IO type for pin '$pin': $@\n" if $@;
-    warn "Got IO type '$type'\n";
     return $type;
 }
 
