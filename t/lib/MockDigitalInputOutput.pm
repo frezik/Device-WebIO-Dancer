@@ -3,9 +3,6 @@ use v5.12;
 use Moo;
 use namespace::clean;
 
-use constant TYPE_INPUT  => 1;
-use constant TYPE_OUTPUT => 0;
-
 has 'input_pin_count',  is => 'ro';
 has 'output_pin_count', is => 'ro';
 
@@ -26,8 +23,18 @@ has '_pins' => (
 );
 has '_pins_set' => (
     is      => 'ro',
-    default => sub {[]},
 );
+
+
+sub BUILDARGS
+{
+    my ($class, $args) = @_;
+
+    my $pin_count = $args->{input_pin_count};
+    $args->{'_pins_set'} = [ ('IN') x $pin_count ];
+
+    return $args;
+}
 
 
 sub all_desc
@@ -42,11 +49,14 @@ sub all_desc
         ONEWIRE => 0,
         GPIO => {
             map {
+                my $function = $self->is_set_input( $_ ) ? 'IN'
+                    : $self->is_set_output( $_ )         ? 'OUT'
+                    : 'UNSET';
                 my $value = $self->input_pin( $_ ) // 0;
-                $_ => {
-                    function => 'IN',
+                ($_ => {
+                    function => $function,
                     value    => $value,
-                };
+                });
             } 0 .. ($pin_count - 1)
         },
     );
@@ -65,7 +75,7 @@ sub mock_set_input
 sub is_set_input
 {
     my ($self, $pin) = @_;
-    return $self->_pins_set->[$pin] == TYPE_INPUT;
+    return $self->_pins_set->[$pin] eq 'IN';
 }
 
 sub mock_get_output
@@ -77,7 +87,7 @@ sub mock_get_output
 sub is_set_output
 {
     my ($self, $pin) = @_;
-    return $self->_pins_set->[$pin] == TYPE_OUTPUT;
+    return $self->_pins_set->[$pin] eq 'OUT';
 }
 
 
@@ -90,7 +100,7 @@ sub input_pin
 sub set_as_input
 {
     my ($self, $pin) = @_;
-    $self->_pins_set->[$pin] = TYPE_INPUT;
+    $self->_pins_set->[$pin] = 'IN';
     return 1;
 }
 
@@ -104,7 +114,7 @@ sub output_pin
 sub set_as_output
 {
     my ($self, $pin) = @_;
-    $self->_pins_set->[$pin] = TYPE_OUTPUT;
+    $self->_pins_set->[$pin] = 'OUT';
     return 1;
 }
 

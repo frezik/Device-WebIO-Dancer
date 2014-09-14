@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 42;
+use Test::More tests => 43;
 use v5.12;
 use lib 't/lib';
 use PlackTest;
@@ -29,6 +29,7 @@ use HTTP::Request::Common;
 use Device::WebIO::Dancer;
 use Device::WebIO;
 use MockDigitalInputOutput;
+use JSON;
 
 my $io = MockDigitalInputOutput->new({
     input_pin_count  => 8,
@@ -95,7 +96,7 @@ ok( $io->mock_get_output( 1 ), "Output value set by port write" );
 
 $res = $test->request( GET "/devices/foo/*" );
 cmp_ok( $res->code, '==', 200, "Got read all everything response" );
-cmp_ok( $res->content, 'eq', "0:UNSET,0:UNSET,0:UNSET,0:UNSET,0:OUT,1:IN,0:OUT,0:IN" );
+cmp_ok( $res->content, 'eq', "0:IN,1:IN,1:IN,0:IN,0:OUT,1:IN,0:OUT,0:IN" );
 
 
 $res = $test->request( GET "/GPIO/0/function" );
@@ -126,9 +127,13 @@ cmp_ok( $res->code, '==', 200, "Set pulse response" );
 $res = $test->request( POST "/GPIO/1/sequence/10,010" );
 cmp_ok( $res->code, '==', 200, "Set sequence response" );
 
+$res = $test->request( POST "/GPIO/3/function/OUT" );
+
 $res = $test->request( GET "/*" );
 cmp_ok( $res->code, '==', 200, "Got function response in" );
-like( $res->content, qr/"UART"/x );
+my $all_data = decode_json( $res->content );
+ok( exists $all_data->{UART} );
+cmp_ok( $all_data->{GPIO}{'3'}{function}, 'eq', 'OUT' );
 
 $res = $test->request( GET "/map" );
 cmp_ok( $res->code, '==', 200, "Got function response in" );
