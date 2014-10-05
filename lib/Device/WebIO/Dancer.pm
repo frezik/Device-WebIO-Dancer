@@ -422,8 +422,13 @@ __END__
 
 
 =head1 NAME
+    
+    Device::WebIO::Dancer - REST API on top of Device::WebIO
 
 =head1 DESCRIPTION
+
+Provides a REST-based interface for controlling C<Device::WebIO> over HTTP.  
+The API is in line with the WebIOPi API (L<https://code.google.com/p/webiopi/>).
 
 =head1 DEPLOYMENT
 
@@ -437,6 +442,27 @@ script you want:
 		PerlResponseHandler Plack::Handler::Apache2
 		PerlSetVar psgi_app /var/www/raspberrypi.psgi
 	</Location>
+
+Create the C<raspberrypi.psgi> file pointed to above:
+
+    use Dancer;
+    use Device::WebIO::Dancer;
+    use Device::WebIO;
+    use Device::WebIO::RaspberryPi;
+    use Plack::Builder;
+
+    my $webio = Device::WebIO->new;
+    my $rpi = Device::WebIO::RaspberryPi->new;
+    $webio->register( 'rpi', $rpi );
+
+    Device::WebIO::Dancer::init( $webio, 'rpi' );
+     
+    builder {
+        dance;
+    };
+
+If you would like to use the still image interface on the Raspberry Pi, add 
+the user C<www-data> to the group C<video>.
 
 Copy the C<public/> directory from the Device::WebIO::Dancer distribution 
 into its own directory in your VirtualHost's docroot.  If you copied it to 
@@ -478,5 +504,29 @@ C<http://example.com/app/app/gpio-header/index.html> should get you a
 layout of the pins with their current values.
 
 =head1 LICENSE
+
+Copyright (c) 2014  Timm Murray
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are 
+permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list of 
+      conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of
+      conditions and the following disclaimer in the documentation and/or other materials 
+      provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
+COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
 
 =cut
