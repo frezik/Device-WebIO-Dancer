@@ -5,7 +5,6 @@
 * Catch exceptions and throw right error code
 * Implement PWM interface
 * Invent interfaces:
-    * Still camera
     * SPI
     * I2C
     * 1-Wire

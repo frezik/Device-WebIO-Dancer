@@ -305,6 +305,42 @@ type, like "text/video".  It's split up this way for the sake of
 popular server-side web libraries.
 
 
+=head2 Still Images
+
+B<COMPATIBILITY NOTE>: This is an extension which is not currently 
+implemented in WebIOPi
+
+=head3 GET /devices/[name]/image/count
+
+Returns the number of image streams that are available.
+
+=head3 GET /devices/[name]/image/[channel]/resolution
+
+Returns the width and height separated by an I<x> list.  Example:
+
+  640x480
+
+=head3 POST /devices/[name]/image/[channel]/resolution/[width]/[height]
+
+Sets the resolution of the given channel.
+
+If the channel refuses to set the given resolution, HTTP status code 403 
+will be sent.
+
+=head3 GET /devices/[name]/image/[channel]/allowed-content-types
+
+Get list of allowed MIME content types.  Allowed types will be sent as a 
+MIME string, with one on each line.
+
+=head3 GET /devices/[name]/image/[channel]/stream/[content-type1]/[content-type2]
+
+Get the image with the desired content type.
+
+B<NOTE>: [content-type1]/[content-type2] is really just a straight MIME 
+type, like "text/video".  It's split up this way for the sake of 
+popular server-side web libraries.
+
+
 =head2 SPI
 
 =head2 I2C

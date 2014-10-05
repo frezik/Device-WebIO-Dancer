@@ -267,6 +267,51 @@ get '/devices/:name/analog/:pin/volt' => sub {
     return $value;
 };
 
+get '/devices/:name/image/count' => sub {
+    my $name = params->{name};
+    my $value = $webio->img_channels( $name );
+    return $value;
+};
+
+get '/devices/:name/image/:pin/resolution' => sub {
+    my $name   = params->{name};
+    my $pin    = params->{pin};
+    my $width  = $webio->img_width( $name, $pin );
+    my $height = $webio->img_height( $name, $pin );
+    return $width . 'x' . $height;
+};
+
+post '/devices/:name/image/:pin/resolution/:width/:height' => sub {
+    my $name   = params->{name};
+    my $pin    = params->{pin};
+    my $width  = params->{width};
+    my $height = params->{height};
+    $webio->img_set_width( $name, $pin, $width );
+    $webio->img_set_height( $name, $pin, $height );
+    return 1;
+};
+
+get '/devices/:name/image/:pin/allowed-content-types' => sub {
+    my $name = params->{name};
+    my $pin  = params->{pin};
+    my $types = $webio->img_allowed_content_types( $name, $pin );
+    return join( "\n", @$types );
+};
+
+get '/devices/:name/image/:pin/stream/:mime1/:mime2' => sub {
+    my $name  = params->{name};
+    my $pin   = params->{pin};
+    my $mime1 = params->{mime1};
+    my $mime2 = params->{mime2};
+    my $fh = $webio->img_stream( $name, $pin, "$mime1/$mime2" );
+
+    local $/ = undef;
+    my $buffer = <$fh>;
+    close $fh;
+
+    return $buffer;
+};
+
 
 get '/GPIO/:pin/function' => sub {
     my $pin  = params->{pin};
