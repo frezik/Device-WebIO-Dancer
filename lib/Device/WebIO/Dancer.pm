@@ -303,12 +303,14 @@ get '/devices/:name/image/:pin/stream/:mime1/:mime2' => sub {
     my $pin   = params->{pin};
     my $mime1 = params->{mime1};
     my $mime2 = params->{mime2};
-    my $fh = $webio->img_stream( $name, $pin, "$mime1/$mime2" );
+    my $mime  = "$mime1/$mime2";
+    my $fh = $webio->img_stream( $name, $pin, $mime );
 
     local $/ = undef;
     my $buffer = <$fh>;
     close $fh;
 
+    content_type $mime;
     return $buffer;
 };
 
