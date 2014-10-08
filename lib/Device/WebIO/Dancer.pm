@@ -314,6 +314,24 @@ get '/devices/:name/image/:pin/stream/:mime1/:mime2' => sub {
     return $buffer;
 };
 
+get '/devices/:name/sensor/temperature/c' => sub {
+    my $name = params->{name};
+    my $count = $webio->temp_celsius( $name );
+    return $count;
+};
+
+get '/devices/:name/sensor/temperature/k' => sub {
+    my $name = params->{name};
+    my $count = $webio->temp_kelvins( $name );
+    return $count;
+};
+
+get '/devices/:name/sensor/temperature/f' => sub {
+    my $name = params->{name};
+    my $count = $webio->temp_fahrenheit( $name );
+    return $count;
+};
+
 
 get '/GPIO/:pin/function' => sub {
     my $pin  = params->{pin};

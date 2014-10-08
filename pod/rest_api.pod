@@ -340,6 +340,20 @@ B<NOTE>: [content-type1]/[content-type2] is really just a straight MIME
 type, like "text/video".  It's split up this way for the sake of 
 popular server-side web libraries.
 
+=head2 Temperature
+
+=head3 GET /devices/[name]/sensor/temperature/c
+
+Returns the current temperature in celsius.
+
+=head3 GET /devices/[name]/sensor/temperature/k
+
+Returns the current temperature in kelvin.
+
+=head3 GET /devices/[name]/sensor/temperature/f
+
+Returns the current temperature in fahrenheit.
+
 
 =head2 SPI
 
