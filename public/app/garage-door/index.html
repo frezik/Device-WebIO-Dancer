@@ -43,7 +43,7 @@
 
         function updateGaragePic()
         {
-            window.navigator.vibrate( 400 );
+            //window.navigator.vibrate( 400 );
             callPost( "/devices/rpi/image/0/resolution/"
                 + IMG_WIDTH + "/" + IMG_HEIGHT );
 
@@ -53,16 +53,16 @@
                 + new Date().getTime()
             );
 
-            window.navigator.vibrate( 200, 50, 400 );
+            //window.navigator.vibrate( 200, 50, 400 );
             return 1;
         }
 
         function toggleDoor()
         {
-            window.navigator.vibrate( 200 );
+            //window.navigator.vibrate( 200 );
             callPost( "/GPIO/" + TOGGLE_PIN + "/sequence/"
                 + TOGGLE_SPEED_MS + ",10" );
-            window.navigator.vibrate( 200, 50, 200, 50, 200 );
+            //window.navigator.vibrate( 200, 50, 200, 50, 200 );
         }
     </script>
 
