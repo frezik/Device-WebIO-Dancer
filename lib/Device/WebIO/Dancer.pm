@@ -4,18 +4,20 @@ package Device::WebIO::Dancer;
 use v5.12;
 use Dancer;
 use Time::HiRes 'sleep';
+use File::Spec;
 
 use constant VID_READ_LENGTH => 4096;
 use constant PULSE_TIME      => 0.1;
 
 
-my ($webio, $default_name);
+my ($webio, $default_name, $public_dir);
 
 sub init
 {
-    my ($webio_ext, $default_name_ext) = @_;
+    my ($webio_ext, $default_name_ext, $public_dir_ext) = @_;
     $webio        = $webio_ext;
     $default_name = $default_name_ext;
+    $public_dir   = $public_dir_ext;
     return 1;
 }
 
@@ -410,6 +412,15 @@ get qr{\A / \* }x => sub {
 
 get '/' => sub {
     return 'Hello, world!';
+};
+
+get '/app/*' => sub {
+    my $params = shift;
+    my ($file) = @{ params->{splat} };
+    my $path   = File::Spec->catfile( $public_dir, 'app', $file );
+    send_file( $path,
+        system_path => 1,
+    );
 };
 
 
