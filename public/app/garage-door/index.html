@@ -11,7 +11,15 @@
         var TOGGLE_PIN      = 4;
         var TOGGLE_SPEED_MS = 500;
 
+        var update_pic;
+        var toggle_door;
+
         $( document ).ready( function() {
+            update_pic  = $( "#update-pic" );
+            toggle_door = $( "#toggle-door" );
+            set_garage_pic_event();
+            set_toggle_door_event();
+
             var img = $( "#garage_pic" );
             img.attr( "width", IMG_WIDTH );
             img.attr( "height", IMG_HEIGHT );
@@ -22,6 +30,21 @@
                 updateGaragePic();
             }, IMG_RELOAD_MS );
         });
+
+        function set_garage_pic_event()
+        {
+            update_pic.click(  function(event) { updateGaragePic() } );
+        }
+
+        function set_toggle_door_event()
+        {
+            toggle_door.click( function(event) { toggleDoor() } );
+        }
+
+        function disable_toggle_door_event()
+        {
+            toggle_door.off();
+        }
 
         function callPost( path )
         {
@@ -59,16 +82,27 @@
 
         function toggleDoor()
         {
+            // Ignore subsequent button presses
+            disable_toggle_door_event();
+            toggle_door.toggleClass( "toggle-door toggle-door-wait" );
+
             //window.navigator.vibrate( 200 );
             callPost( "/GPIO/" + TOGGLE_PIN + "/sequence/"
                 + TOGGLE_SPEED_MS + ",10" );
             //window.navigator.vibrate( 200, 50, 200, 50, 200 );
+
+            set_toggle_door_event();
+            toggle_door.toggleClass( "toggle-door toggle-door-wait" );
         }
     </script>
 
     <style type="text/css">
-        #toggle-door {
+        .toggle-door {
             background-color: red;
+        }
+
+        .toggle-door-wait {
+            background-color: grey;
         }
 
         #update-pic {
@@ -91,8 +125,8 @@
 
 <p><img id="garage_pic"></p>
 
-<div id="update-pic" class="button" onClick="updateGaragePic()">Update Pic</div>
-<div id="toggle-door" class="button" onClick="toggleDoor()">Toggle Door</div>
+<div id="update-pic" class="button">Update Pic</div>
+<div id="toggle-door" class="button toggle-door">Toggle Door</div>
 
 </div>
 </body>
